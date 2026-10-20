@@ -1,0 +1,80 @@
+{
+  "schemaVersion": "1.0.0",
+  "inspector": "alexa-mcp-kit Pre-Flight Readiness Linter (compatible with @alexa-ai/addon-local-inspector)",
+  "evaluatedAt": "2026-10-20T22:49:39.951Z",
+  "endpointUrl": "http://127.0.0.1:61677/mcp",
+  "protocolVersion": "2026-07-28",
+  "verdict": "CERTIFIED",
+  "readinessStatus": "PREFLIGHT_READY",
+  "surfaces": [
+    "show8",
+    "show15",
+    "firetv"
+  ],
+  "passCount": 7,
+  "failCount": 0,
+  "warnCount": 0,
+  "totalRules": 7,
+  "rules": [
+    {
+      "id": "DL-01",
+      "ruleId": "DL-01",
+      "category": "Protocol & Schema",
+      "title": "Streamable HTTP (2026-07-28 / 2025-11-25 / 2025-06-18) Handshake & JSON Schema Integrity",
+      "status": "PASS",
+      "details": "Verified protocolVersion=2026-07-28, Mcp-Session-Id=e16285d7..., 19 tool schemas valid."
+    },
+    {
+      "id": "VR-01",
+      "ruleId": "VR-01",
+      "category": "Visual Resource Binding",
+      "title": "Every Alexa+ Tool Maps to a Valid ui:// MCP App Resource",
+      "status": "PASS",
+      "details": "All 19 tools map to registered ui:// resources."
+    },
+    {
+      "id": "VR-02",
+      "ruleId": "VR-02",
+      "category": "Adaptive Multimodal Layout",
+      "title": "All 3 Alexa+ Display Modes (Inline, Fullscreen, Voice-only) Supported",
+      "status": "PASS",
+      "details": "Verified Inline, Fullscreen, and Voice-only panels across 6 ui:// resources."
+    },
+    {
+      "id": "VR-03",
+      "ruleId": "VR-03",
+      "category": "Accessibility & Contrast",
+      "title": "WCAG 2.1 AA Minimum Contrast Ratio (>= 4.5:1 Computed from CSS)",
+      "status": "PASS",
+      "details": "All 6 resources meet or exceed 4.5:1 computed WCAG contrast ratio."
+    },
+    {
+      "id": "VR-04",
+      "ruleId": "VR-04",
+      "category": "Far-Field Touch Ergonomics",
+      "title": "Interactive Touch Targets >= 44x44px (CSS Enforced)",
+      "status": "PASS",
+      "details": "All 6 resources enforce >= 44x44px touch targets in CSS."
+    },
+    {
+      "id": "DL-02",
+      "ruleId": "DL-02",
+      "category": "Voice-First Fallback",
+      "title": "Voice-Only Spoken Summary & SSML Prosody Readiness",
+      "status": "PASS",
+      "details": "All 19 tools and 6 resources provide Voice-only summaries and SSML."
+    },
+    {
+      "id": "SEC-01",
+      "ruleId": "SEC-01",
+      "category": "Sandbox Security & RPC Bridge",
+      "title": "Strict Content-Security-Policy & MCP Apps postMessage Bridge",
+      "status": "PASS",
+      "details": "All 6 resources enforce strict CSP and MCP Apps postMessage RPC."
+    }
+  ],
+  "notes": [
+    "Static CSS WCAG 2.1 AA contrast & live JSON-RPC protocol readiness verified.",
+    "Pair with official 'npx @alexa-ai/addon-local-inspector' for live Playwright viewport certification."
+  ]
+}

@@ -1,0 +1,246 @@
+{
+  "evaluatedAt": "2026-10-20T22:49:39.951Z",
+  "verdict": "CERTIFIED",
+  "serverInfo": {
+    "name": "billshield-mcp",
+    "version": "2.0.0"
+  },
+  "toolsInspected": 19,
+  "resourcesInspected": 6,
+  "tools": [
+    {
+      "name": "api_lookup_medical_code",
+      "resourceUri": "ui://billshield/agent-surface",
+      "displayModes": [
+        "inline",
+        "fullscreen",
+        "voice-only"
+      ]
+    },
+    {
+      "name": "api_lookup_locality_gpci",
+      "resourceUri": "ui://billshield/agent-surface",
+      "displayModes": [
+        "inline",
+        "fullscreen",
+        "voice-only"
+      ]
+    },
+    {
+      "name": "api_query_fda_enforcement",
+      "resourceUri": "ui://billshield/agent-surface",
+      "displayModes": [
+        "inline",
+        "fullscreen",
+        "voice-only"
+      ]
+    },
+    {
+      "name": "api_query_cpsc_recalls",
+      "resourceUri": "ui://billshield/agent-surface",
+      "displayModes": [
+        "inline",
+        "fullscreen",
+        "voice-only"
+      ]
+    },
+    {
+      "name": "api_lookup_utility_rates",
+      "resourceUri": "ui://billshield/agent-surface",
+      "displayModes": [
+        "inline",
+        "fullscreen",
+        "voice-only"
+      ]
+    },
+    {
+      "name": "calc_medicare_fee_formula",
+      "resourceUri": "ui://billshield/agent-surface",
+      "displayModes": [
+        "inline",
+        "fullscreen",
+        "voice-only"
+      ]
+    },
+    {
+      "name": "calc_line_item_variance",
+      "resourceUri": "ui://billshield/agent-surface",
+      "displayModes": [
+        "inline",
+        "fullscreen",
+        "voice-only"
+      ]
+    },
+    {
+      "name": "calc_tou_load_shift",
+      "resourceUri": "ui://billshield/agent-surface",
+      "displayModes": [
+        "inline",
+        "fullscreen",
+        "voice-only"
+      ]
+    },
+    {
+      "name": "calc_income_ami_subsidy",
+      "resourceUri": "ui://billshield/agent-surface",
+      "displayModes": [
+        "inline",
+        "fullscreen",
+        "voice-only"
+      ]
+    },
+    {
+      "name": "render_echo_show_surface",
+      "resourceUri": "ui://billshield/agent-surface",
+      "displayModes": [
+        "inline",
+        "fullscreen",
+        "voice-only"
+      ]
+    },
+    {
+      "name": "build_dispute_document",
+      "resourceUri": "ui://billshield/claim-packet",
+      "displayModes": [
+        "inline",
+        "fullscreen",
+        "voice-only"
+      ]
+    },
+    {
+      "name": "audit_household_bill",
+      "resourceUri": "ui://billshield/autopsy-board",
+      "displayModes": [
+        "inline",
+        "fullscreen",
+        "voice-only"
+      ]
+    },
+    {
+      "name": "optimize_utility_tariff",
+      "resourceUri": "ui://billshield/tariff-optimizer",
+      "displayModes": [
+        "inline",
+        "fullscreen",
+        "voice-only"
+      ]
+    },
+    {
+      "name": "find_cash_rebates",
+      "resourceUri": "ui://billshield/rebate-board",
+      "displayModes": [
+        "inline",
+        "fullscreen",
+        "voice-only"
+      ]
+    },
+    {
+      "name": "scan_household_recalls",
+      "resourceUri": "ui://billshield/recall-radar",
+      "displayModes": [
+        "inline",
+        "fullscreen",
+        "voice-only"
+      ]
+    },
+    {
+      "name": "generate_official_dispute_or_claim",
+      "resourceUri": "ui://billshield/claim-packet",
+      "displayModes": [
+        "inline",
+        "fullscreen",
+        "voice-only"
+      ]
+    },
+    {
+      "name": "search_tools",
+      "resourceUri": "ui://billshield/agent-surface",
+      "displayModes": [
+        "inline",
+        "fullscreen",
+        "voice-only"
+      ]
+    },
+    {
+      "name": "describe_tool",
+      "resourceUri": "ui://billshield/agent-surface",
+      "displayModes": [
+        "inline",
+        "fullscreen",
+        "voice-only"
+      ]
+    },
+    {
+      "name": "execute_codemode",
+      "resourceUri": "ui://billshield/agent-surface",
+      "displayModes": [
+        "inline",
+        "fullscreen",
+        "voice-only"
+      ]
+    }
+  ],
+  "resources": [
+    {
+      "uri": "ui://billshield/autopsy-board",
+      "mimeType": "text/html;profile=mcp-app",
+      "contrastRatio": 6.47,
+      "minTouchPx": 48,
+      "hasPartnerAttribution": true,
+      "hasStickySummaryFooter": true,
+      "hasCsp": true,
+      "hasRpcBridge": true
+    },
+    {
+      "uri": "ui://billshield/tariff-optimizer",
+      "mimeType": "text/html;profile=mcp-app",
+      "contrastRatio": 6.47,
+      "minTouchPx": 48,
+      "hasPartnerAttribution": true,
+      "hasStickySummaryFooter": true,
+      "hasCsp": true,
+      "hasRpcBridge": true
+    },
+    {
+      "uri": "ui://billshield/rebate-board",
+      "mimeType": "text/html;profile=mcp-app",
+      "contrastRatio": 6.47,
+      "minTouchPx": 48,
+      "hasPartnerAttribution": true,
+      "hasStickySummaryFooter": true,
+      "hasCsp": true,
+      "hasRpcBridge": true
+    },
+    {
+      "uri": "ui://billshield/recall-radar",
+      "mimeType": "text/html;profile=mcp-app",
+      "contrastRatio": 6.47,
+      "minTouchPx": 48,
+      "hasPartnerAttribution": true,
+      "hasStickySummaryFooter": true,
+      "hasCsp": true,
+      "hasRpcBridge": true
+    },
+    {
+      "uri": "ui://billshield/claim-packet",
+      "mimeType": "text/html;profile=mcp-app",
+      "contrastRatio": 6.47,
+      "minTouchPx": 48,
+      "hasPartnerAttribution": true,
+      "hasStickySummaryFooter": true,
+      "hasCsp": true,
+      "hasRpcBridge": true
+    },
+    {
+      "uri": "ui://billshield/agent-surface",
+      "mimeType": "text/html;profile=mcp-app",
+      "contrastRatio": 6.47,
+      "minTouchPx": 48,
+      "hasPartnerAttribution": true,
+      "hasStickySummaryFooter": true,
+      "hasCsp": true,
+      "hasRpcBridge": true
+    }
+  ],
+  "failedRules": []
+}
