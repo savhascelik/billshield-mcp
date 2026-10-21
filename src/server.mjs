@@ -1214,8 +1214,9 @@ const isMain =
 
 if (isMain) {
   const port = Number(process.env.PORT || 4040);
+  const host = process.env.HOST || "127.0.0.1";
   const server = createBillShieldServer();
-  const info = await server.listen(port, "127.0.0.1");
+  const info = await server.listen(port, host);
   console.log(`[BillShield MCP] Alexa+ Streamable HTTP MCP Endpoint: ${info.url}`);
   console.log(`[BillShield MCP] Alexa+ 3-Mode Interactive Device Simulator: ${info.baseUrl}/simulator`);
 }
