@@ -540,7 +540,7 @@ export function createBillShieldServer(options = {}) {
             toolName: "generate_official_dispute_or_claim",
             toolArgs: {
               claimType: "RECALL_REFUND",
-              recallId: "CPSC-24-311 / CPSC-24-068",
+              recallId: "CPSC-25-063 / CPSC-23-130",
               productName: "Recalled Household Items",
               savingsAmount: data.totalRefundDollars
             },
@@ -618,22 +618,29 @@ export function createBillShieldServer(options = {}) {
 
   server.registerAppTool({
     name: "api_lookup_medical_code",
-    title: "Live NIH HCPCS/CPT & Raw RVU Weight Lookup",
+    title: "Live NIH HCPCS/CPT, openFDA NDC & Raw RVU Weight Lookup",
     category: "api",
     domain: "medical",
-    tags: ["api", "nih", "hcpcs", "cpt", "rvu", "ncci", "medical"],
+    tags: ["api", "nih", "hcpcs", "cpt", "ndc", "rvu", "ncci", "medical"],
     compositionHint:
       "Pass returned rvu.workRvu, rvu.peRvu, rvu.mpRvu into calc_medicare_fee_formula along with GPCI from api_lookup_locality_gpci and your chosen conversionFactor.",
     description:
-      "Queries the live U.S. National Library of Medicine (NIH Clinical Tables API) for an HCPCS/CPT procedure code and returns its official clinical description, raw RVU component weights (workRvu, peRvu, mpRvu), and NCCI bundling relationships — with ZERO hardcoded dollar prices.",
+      "[PRIMARY AGENTIC API TOOL] Queries the live U.S. National Library of Medicine (NIH Clinical Tables API) and live U.S. FDA openFDA NDC API using your chosen 'code' or free-text 'query' (e.g. '99285', '80053', 'chest xray', '0069-3150'). Returns live candidate matches (nihLiveMatches, fdaNdcLiveMatches), official clinical description, raw RVU component weights (workRvu, peRvu, mpRvu), and NCCI bundling relationships — with ZERO hardcoded dollar prices.",
     resourceUri: "ui://billshield/agent-surface",
     inputSchema: {
       type: "object",
-      required: ["code"],
       properties: {
         code: {
           type: "string",
-          description: "5-character CPT/HCPCS code (e.g. '99285', '80053', '36415', '71046')."
+          description: "5-character CPT/HCPCS/Dental code or FDA NDC prefix (e.g. '99285', '80053', '36415', '71046', '0069-3150')."
+        },
+        query: {
+          type: "string",
+          description: "Free-text medical procedure, drug name, or code search query sent directly to live NIH Clinical Tables & openFDA NDC APIs."
+        },
+        maxList: {
+          type: "number",
+          description: "Maximum number of live NIH / openFDA candidate matches to return (1–20, default 5)."
         },
         facilitySetting: {
           type: "string",
@@ -645,9 +652,10 @@ export function createBillShieldServer(options = {}) {
       const res = await apiLookupMedicalCode(args);
       const rvuPart = res.rvu
         ? `raw Work RVU ${res.rvu.workRvu}, PE RVU ${res.rvu.peRvu}, MP RVU ${res.rvu.mpRvu}`
-        : "no Medicare RVU weights";
+        : "no embedded RVU weights (supply custom RVU or referenceAmount to calc_* tools)";
+      const descText = res.officialDescription || "no matching medical/NDC record";
       return {
-        voiceSummary: `NIH API verified code ${res.code} (${res.officialDescription}) with ${rvuPart}. Pass these weights and a conversionFactor into calc_medicare_fee_formula.`,
+        voiceSummary: `NIH & openFDA API lookup for '${res.query}' returned ${res.code} (${descText}) with ${rvuPart}. Pass these weights and your chosen conversionFactor into calc_medicare_fee_formula.`,
         structuredContent: res
       };
     }
@@ -662,7 +670,7 @@ export function createBillShieldServer(options = {}) {
     compositionHint:
       "Pass returned gpci.gpciWork, gpci.gpciPe, gpci.gpciMp into calc_medicare_fee_formula, or areaMedianIncome4Person into calc_income_ami_subsidy.",
     description:
-      "Resolves any 5-digit U.S. ZIP code via the live Zippopotam.us API (city, state, coordinates) and returns the raw Geographic Practice Cost Indices (gpciWork, gpciPe, gpciMp) and 4-person Area Median Income (AMI).",
+      "[PRIMARY AGENTIC API TOOL] Resolves any 5-digit U.S. ZIP code via the live Zippopotam.us API (city, state, coordinates) and returns the raw Geographic Practice Cost Indices (gpciWork, gpciPe, gpciMp) and 4-person Area Median Income (AMI).",
     resourceUri: "ui://billshield/agent-surface",
     inputSchema: {
       type: "object",
@@ -690,7 +698,7 @@ export function createBillShieldServer(options = {}) {
     domain: "recall",
     tags: ["api", "fda", "openfda", "recall", "food", "drug", "device"],
     description:
-      "Queries the live U.S. Food & Drug Administration (api.fda.gov) enforcement database for active food, drug, or medical device recalls matching a keyword.",
+      "[PRIMARY AGENTIC API TOOL] Queries the live U.S. Food & Drug Administration (api.fda.gov) enforcement REST API directly using your chosen 'query', 'domain' ('food' | 'drug' | 'device'), 'classification' ('Class I' | 'Class II' | 'Class III'), and 'limit'. Returns raw FDA enforcement records for the LLM to evaluate.",
     resourceUri: "ui://billshield/agent-surface",
     inputSchema: {
       type: "object",
@@ -733,7 +741,7 @@ export function createBillShieldServer(options = {}) {
     domain: "recall",
     tags: ["api", "cpsc", "saferproducts", "recall", "appliance", "refund"],
     description:
-      "Queries the live U.S. Consumer Product Safety Commission (saferproducts.gov) REST API for official consumer product recalls, hazard descriptions, and remedy instructions.",
+      "[PRIMARY AGENTIC API TOOL] Queries the live U.S. Consumer Product Safety Commission (saferproducts.gov/RestWebServices/Recall) REST API directly using your chosen 'query'/'productName' and optional 'hazard' filter. Returns live CPSC recall records, official CPSC URLs, hazards, and manufacturer remedies for the LLM to inspect.",
     resourceUri: "ui://billshield/agent-surface",
     inputSchema: {
       type: "object",
@@ -774,7 +782,7 @@ export function createBillShieldServer(options = {}) {
     compositionHint:
       "Pass returned rates.peakRatePerKwh and rates.offPeakRatePerKwh into calc_tou_load_shift.",
     description:
-      "Looks up raw Time-of-Use (TOU) electricity tariff parameters (peakRatePerKwh, offPeakRatePerKwh, fixedMonthlyCustomerCharge, peakWindow) for any U.S. ZIP code or state without performing appliance assumptions.",
+      "[PRIMARY AGENTIC API TOOL] Resolves any U.S. ZIP code via live Zippopotam.us geolocation and returns raw Time-of-Use (TOU) electricity tariff parameters (peakRatePerKwh, shoulderRatePerKwh, offPeakRatePerKwh, fixedMonthlyCustomerCharge, peakWindow) without making fixed appliance usage assumptions.",
     resourceUri: "ui://billshield/agent-surface",
     inputSchema: {
       type: "object",
@@ -815,7 +823,7 @@ export function createBillShieldServer(options = {}) {
     compositionHint:
       "Supply workRvu/peRvu/mpRvu from api_lookup_medical_code, gpci from api_lookup_locality_gpci, and your chosen conversionFactor (e.g. 32.35 or 40.00). Then pass totalReferenceFee to calc_line_item_variance.",
     description:
-      "Executes the exact Medicare fee formula `((workRvu * gpciWork) + (peRvu * gpciPe) + (mpRvu * gpciMp)) * conversionFactor * modifierMultiplier * units`. Contains ZERO hardcoded conversion factors — Alexa+ must supply `conversionFactor` dynamically (e.g. 32.35 today, 40.00 tomorrow).",
+      "[PRIMARY AGENTIC MATH TOOL] Executes the exact Medicare fee formula `((workRvu * gpciWork) + (peRvu * gpciPe) + (mpRvu * gpciMp)) * conversionFactor * modifierMultiplier * units`. Contains ZERO hardcoded conversion factors — the LLM must supply `conversionFactor` dynamically (e.g. 32.35 today, 40.00 tomorrow).",
     resourceUri: "ui://billshield/agent-surface",
     inputSchema: {
       type: "object",
@@ -854,7 +862,7 @@ export function createBillShieldServer(options = {}) {
     domain: "medical",
     tags: ["math", "calc", "variance", "overcharge", "multiplier", "markup"],
     description:
-      "Calculates the allowed ceiling (`referenceAmount * allowedMultiplier`), markup ratio, and net overcharge (`max(0, billedAmount - allowedCeiling)`) for a billed line item using an agent-supplied `allowedMultiplier`.",
+      "[PRIMARY AGENTIC MATH TOOL] Calculates the allowed ceiling (`referenceAmount * allowedMultiplier`), markup ratio, and net overcharge (`max(0, billedAmount - allowedCeiling)`) for a billed line item using an LLM-supplied `allowedMultiplier`.",
     resourceUri: "ui://billshield/agent-surface",
     inputSchema: {
       type: "object",
@@ -891,7 +899,7 @@ export function createBillShieldServer(options = {}) {
     domain: "utility",
     tags: ["math", "calc", "utility", "tou", "kwh", "savings"],
     description:
-      "Calculates monthly and annual electricity savings from shifting specified appliance loads (`kilowatts`, `durationHours`, `runsPerMonth`) from `currentRatePerKwh` to `targetRatePerKwh`.",
+      "[PRIMARY AGENTIC MATH TOOL] Calculates monthly and annual electricity savings from shifting LLM-specified appliance loads (`kilowatts`, `durationHours`, `runsPerMonth`) from `currentRatePerKwh` to `targetRatePerKwh`.",
     resourceUri: "ui://billshield/agent-surface",
     inputSchema: {
       type: "object",
@@ -923,7 +931,7 @@ export function createBillShieldServer(options = {}) {
     domain: "rebate",
     tags: ["math", "calc", "ami", "income", "subsidy", "rebate"],
     description:
-      "Calculates household income as a percentage of size-adjusted Area Median Income (AMI) and applies caller-supplied `coverageRate` and `maxCap` (`min(projectCost * coverageRate, maxCap)`).",
+      "[PRIMARY AGENTIC MATH TOOL] Calculates household income as a percentage of size-adjusted Area Median Income (AMI) and applies LLM-supplied `coverageRate` and `maxCap` (`min(projectCost * coverageRate, maxCap)`).",
     resourceUri: "ui://billshield/agent-surface",
     inputSchema: {
       type: "object",
@@ -957,7 +965,7 @@ export function createBillShieldServer(options = {}) {
     domain: "ui",
     tags: ["ui", "render", "echo", "surface", "carousel", "fullscreen"],
     description:
-      "Renders agent-computed metrics and line-item rows from `api_*` and `calc_*` tools onto the Echo Show 3-mode visual surface (`Inline`, `Fullscreen`, `Voice-only`).",
+      "[PRIMARY AGENTIC UI TOOL] Renders LLM-computed metrics and line-item rows from `api_*` and `calc_*` tools onto the Echo Show 3-mode visual surface (`Inline`, `Fullscreen`, `Voice-only`).",
     resourceUri: "ui://billshield/agent-surface",
     inputSchema: {
       type: "object",
@@ -990,7 +998,7 @@ export function createBillShieldServer(options = {}) {
     domain: "medical",
     tags: ["ui", "dispute", "letter", "legal", "claim", "trace"],
     description:
-      "Compiles a formal billing dispute or claim packet embedding the exact `formulaTrace` strings and `conversionFactorUsed` produced by `calc_*` tools.",
+      "[PRIMARY AGENTIC DISPUTE TOOL] Compiles a formal billing dispute or claim packet embedding the exact `formulaTrace` strings, `conversionFactorUsed`, and item-by-item calculations produced by the LLM via `api_*` and `calc_*` tools.",
     resourceUri: "ui://billshield/claim-packet",
     inputSchema: {
       type: "object",
@@ -1025,12 +1033,12 @@ export function createBillShieldServer(options = {}) {
   // Register Tool 1: audit_household_bill
   server.registerAppTool({
     name: "audit_household_bill",
-    title: "Audit Household & Medical Bill",
+    title: "Audit Household & Medical Bill (Composite Convenience Wrapper)",
     category: "workflow",
     domain: "medical",
     tags: ["workflow", "audit", "bill", "autopsy"],
     description:
-      "Audits itemized medical, hospital, dental, ISP, or utility bills against CMS Medicare Fee Schedule, NCCI unbundling rules, and consumer junk-fee statutes.",
+      "[One-Shot Composite Convenience Wrapper — For granular LLM reasoning, live API candidate selection, and custom parameter math, prefer chaining api_lookup_medical_code + api_lookup_locality_gpci + calc_medicare_fee_formula + calc_line_item_variance + build_dispute_document] Audits itemized medical, hospital, dental, ISP, or utility bills against CMS Medicare Fee Schedule baselines, Reference-Based Pricing targets, NCCI unbundling rules, and FCC Truth-in-Billing rules.",
     resourceUri: "ui://billshield/autopsy-board",
     inputSchema: {
       type: "object",
@@ -1078,12 +1086,12 @@ export function createBillShieldServer(options = {}) {
   // Register Tool 2: optimize_utility_tariff
   server.registerAppTool({
     name: "optimize_utility_tariff",
-    title: "Optimize Electric Utility Time-of-Use Tariff",
+    title: "Optimize Electric Utility Time-of-Use Tariff (Composite Convenience Wrapper)",
     category: "workflow",
     domain: "utility",
     tags: ["workflow", "utility", "tariff", "tou"],
     description:
-      "Analyzes regional OpenEI Time-of-Use (Peak vs Off-Peak) electricity rates by ZIP code and calculates monthly/annual appliance shift savings.",
+      "[One-Shot Composite Convenience Wrapper — For custom appliance kW/duration/runs math, prefer chaining api_lookup_utility_rates + calc_tou_load_shift] Analyzes regional OpenEI Time-of-Use (Peak vs Off-Peak) electricity rates by ZIP code and calculates monthly/annual appliance shift savings.",
     resourceUri: "ui://billshield/tariff-optimizer",
     inputSchema: {
       type: "object",
@@ -1108,12 +1116,12 @@ export function createBillShieldServer(options = {}) {
   // Register Tool 3: find_cash_rebates
   server.registerAppTool({
     name: "find_cash_rebates",
-    title: "Find Renter & Homeowner Cash Rebates",
+    title: "Find Renter & Homeowner Cash Rebates (Composite Convenience Wrapper)",
     category: "workflow",
     domain: "rebate",
     tags: ["workflow", "rebate", "ira", "hear", "renter"],
     description:
-      "Finds federal IRA (HEAR/25C) point-of-sale cash rebates, portable renter upgrades, and community solar utility bill credits by ZIP code, income, and renter/owner status.",
+      "[One-Shot Composite Convenience Wrapper — For custom projectCost/coverageRate/maxCap math, prefer chaining api_lookup_locality_gpci + calc_income_ami_subsidy] Finds federal IRA (HEAR/25C) point-of-sale cash rebates, portable renter upgrades, and community solar utility bill credits by ZIP code, income, and renter/owner status.",
     resourceUri: "ui://billshield/rebate-board",
     inputSchema: {
       type: "object",
@@ -1137,12 +1145,12 @@ export function createBillShieldServer(options = {}) {
   // Register Tool 4: scan_household_recalls
   server.registerAppTool({
     name: "scan_household_recalls",
-    title: "Scan Household Products for CPSC & openFDA Recall Refunds",
+    title: "Scan Household Products for CPSC & openFDA Recall Refunds (Composite Convenience Wrapper)",
     category: "workflow",
     domain: "recall",
     tags: ["workflow", "recall", "cpsc", "fda"],
     description:
-      "Scans household appliances, kids' gear, and pantry items against live CPSC and openFDA recall databases for no-receipt cash refunds.",
+      "[One-Shot Composite Convenience Wrapper — For direct live API querying with custom keywords, domains, and hazard filters, prefer calling api_query_cpsc_recalls and api_query_fda_enforcement directly] Scans household appliances, kids' gear, and pantry items against CPSC and openFDA recall databases for no-receipt cash refunds.",
     resourceUri: "ui://billshield/recall-radar",
     inputSchema: {
       type: "object",
@@ -1165,12 +1173,12 @@ export function createBillShieldServer(options = {}) {
   // Register Tool 5: generate_official_dispute_or_claim
   server.registerAppTool({
     name: "generate_official_dispute_or_claim",
-    title: "Generate Official Billing Dispute or Cash Claim Packet",
+    title: "Generate Official Billing Dispute or Cash Claim Packet (Composite Convenience Wrapper)",
     category: "workflow",
     domain: "medical",
     tags: ["workflow", "dispute", "claim", "letter"],
     description:
-      "Generates a formal, statute-cited billing dispute letter (No Surprises Act / CMS / NCCI) or CPSC recall/rebate claim form ready to sign and send.",
+      "[One-Shot Composite Convenience Wrapper — When you have computed itemized math via api_* and calc_* tools, prefer build_dispute_document instead] Generates a formal, statute-cited billing dispute letter (Itemized Bill / IRS 501(r) / CMS Reference-Based Pricing / NCCI) or CPSC recall/rebate claim form ready to sign and send.",
     resourceUri: "ui://billshield/claim-packet",
     inputSchema: {
       type: "object",

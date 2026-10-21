@@ -460,6 +460,7 @@ export async function apiLookupMedicalCode(params = {}, options = {}) {
     : null;
 
   const fdaLead = fdaNdcMatches[0] || null;
+  const matched = Boolean((nihMatches[0] && nihMatches[0].description) || fdaLead || refEntry);
   const officialDescription =
     (nihMatches[0] && nihMatches[0].description) ||
     (fdaLead &&
@@ -467,21 +468,28 @@ export async function apiLookupMedicalCode(params = {}, options = {}) {
         fdaLead.dosageForm
       } [NDC ${fdaLead.productNdc}]`) ||
     (refEntry && refEntry.officialDescription) ||
-    `Medical / Healthcare Procedure (${lookupKey})`;
+    null;
 
   return {
     code: fdaLead && isNdcFormat ? fdaLead.productNdc : lookupKey,
     query: rawQuery,
+    matched,
     officialDescription,
     category:
       (refEntry && refEntry.category) ||
-      (fdaLead ? "FDA National Drug Code (NDC) Pharmaceutical" : classifyCodeCategory(lookupKey)),
+      (fdaLead
+        ? "FDA National Drug Code (NDC) Pharmaceutical"
+        : matched
+        ? classifyCodeCategory(lookupKey)
+        : "Unmatched / Non-Medical or Unlisted Code"),
     rvuAvailable: Boolean(rvuData),
     rvuComponents: rvuData,
     rvu: rvuData,
     rvuNote: rvuData
       ? "Matched in CMS CY2026 RVU Reference Subset."
-      : "Code not present in embedded CMS CY2026 RVU subset; live NIH / openFDA NDC metadata retrieved. Supply explicit RVU weights to calc_medicare_fee_formula.",
+      : matched
+      ? "Live NIH / openFDA NDC metadata retrieved; code not in embedded 26-code CMS RVU subset. Supply explicit workRvu/peRvu/mpRvu or referenceAmount to calc_medicare_fee_formula / calc_line_item_variance."
+      : "No matching HCPCS/CPT or FDA NDC record found in live NIH Clinical Tables or openFDA APIs.",
     ncciBundledWith: refEntry ? refEntry.ncciBundledWith : [],
     nihLiveMatches: nihMatches,
     fdaNdcLiveMatches: fdaNdcMatches,

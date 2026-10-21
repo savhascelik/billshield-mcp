@@ -251,7 +251,26 @@ export const CMS_CPT_BENCHMARKS = Object.freeze({
     cmsNationalFacilityRate: 0.0,
     fairCommercialCeiling: 0.0,
     junkFeeWhenCustomerOwned: true,
-    authority: "Television Viewer Protection Act (47 U.S.C. § 562) — Ban on charging for customer-owned equipment"
+    authority: "Television Viewer Protection Act (47 U.S.C. § 562) & FCC Broadband Equipment Billing Rules — Ban on charging for customer-owned equipment"
+  },
+  "ISP-SURCHARGE": {
+    code: "ISP-SURCHARGE",
+    description: "Discretionary Carrier Cost-Recovery / Broadcast Surcharge",
+    keywords: [
+      "regional sports",
+      "broadcast fee",
+      "broadcast tv fee",
+      "network infrastructure recovery",
+      "infrastructure recovery fee",
+      "regulatory recovery fee",
+      "cost recovery fee",
+      "carrier surcharge",
+      "isp-surcharge"
+    ],
+    cmsNationalFacilityRate: 0.0,
+    fairCommercialCeiling: 0.0,
+    junkFeeAlways: true,
+    authority: "FCC Truth-in-Billing Rules (47 C.F.R. § 64.2401) & FCC Broadband Consumer Label Rules (47 C.F.R. § 8.1(a)) — Non-governmental carrier cost-recovery and unbundled broadcast surcharges"
   },
   "UTIL-ADMIN": {
     code: "UTIL-ADMIN",
@@ -343,20 +362,35 @@ export function auditHouseholdBill(input = {}) {
     const billedCents = toCents(raw.billedAmount);
     totalBilledCents += billedCents;
 
-    const countSoFar = (seenCodeCounts.get(code) || 0) + 1;
-    seenCodeCounts.set(code, countSoFar);
+    const dupKey =
+      code === "ISP-SURCHARGE" || code === "UTIL-ADMIN" || code.startsWith("ITEM-")
+        ? `${code}:${String(raw.description || "").trim().toLowerCase()}`
+        : code;
+    const countSoFar = (seenCodeCounts.get(dupKey) || 0) + 1;
+    seenCodeCounts.set(dupKey, countSoFar);
 
+    const hasLiveMedicalMatch = Boolean(liveMeta && liveMeta.matched && liveMeta.officialDescription);
     let fairCents = billedCents;
     let violationType = null;
-    let reason =
-      liveMeta && liveMeta.officialDescription
-        ? `Verified via live NIH/openFDA API: ${liveMeta.officialDescription}`
-        : "Verified within regional benchmark";
+    let cmsMedicareRate =
+      ref && ref.cmsNationalFacilityRate > 0
+        ? Number((ref.cmsNationalFacilityRate * cfScale).toFixed(2))
+        : null;
+    let fairCommercialBenchmark =
+      ref && ref.fairCommercialCeiling > 0
+        ? Number((ref.fairCommercialCeiling * cfScale).toFixed(2))
+        : null;
+
+    let reason = ref
+      ? `Within Reference-Based Pricing ceiling ($${(fairCommercialBenchmark ?? toDollars(billedCents)).toFixed(2)}; 100% CMS Medicare baseline: $${(cmsMedicareRate ?? 0).toFixed(2)}).`
+      : hasLiveMedicalMatch
+      ? `Verified medical/drug code via live NIH/openFDA API: ${liveMeta.officialDescription} (no overcharge rule triggered).`
+      : "Base contracted service rate or unmapped line item (not a medical CPT/HCPCS code or prohibited surcharge); verify against contracted plan or FCC Broadband Consumer Label.";
     let citation = ref
       ? ref.authority
-      : liveMeta && liveMeta.sourceMetadata
+      : hasLiveMedicalMatch && liveMeta.sourceMetadata
       ? liveMeta.sourceMetadata.authority
-      : "Standard Billing Schedule";
+      : "Contracted Service Schedule / FCC Broadband Consumer Label (47 C.F.R. § 8.1)";
 
     // Rule 1: Exact duplicate charge on the same statement
     if (countSoFar > 1) {
@@ -373,42 +407,48 @@ export function auditHouseholdBill(input = {}) {
       if (bundledParent) {
         fairCents = 0;
         violationType = "NCCI_UNBUNDLED_FEE";
-        reason = `Code ${code} (${ref.description}) is bundled into primary procedure ${bundledParent} and cannot be billed separately.`;
+        reason = `Coding Violation: Code ${code} (${ref.description}) is bundled into primary procedure ${bundledParent} under CMS NCCI PTP edits and cannot be billed separately.`;
         citation = ref.authority;
       } else if (ref.junkFeeWhenCustomerOwned && customerOwnsModem) {
         // Rule 3: Customer-owned equipment fee
         fairCents = 0;
         violationType = "ILLEGAL_EQUIPMENT_FEE";
-        reason = "Customer owns router/modem; charging monthly rental fee violates 47 U.S.C. § 562.";
+        reason = "Customer owns router/modem; charging monthly rental fee for unleased equipment is prohibited (47 U.S.C. § 562 / FCC Equipment Rules). Provide modem MAC/serial to remove & refund.";
         citation = ref.authority;
       } else if (ref.junkFeeAlways) {
         fairCents = 0;
-        violationType = "JUNK_SURCHARGE";
-        reason = `${ref.description} is an unbundled administrative junk fee.`;
+        violationType = "DISCRETIONARY_CARRIER_SURCHARGE";
+        reason = `${raw.description || ref.description} is a non-governmental carrier cost-recovery or unbundled broadcast surcharge (not a statutory tax) disputable under FCC Truth-in-Billing (47 C.F.R. § 64.2401).`;
         citation = ref.authority;
       } else {
-        // Rule 4: Upcoding & CMS Medicare Commercial Benchmark Cap (scaled by conversionFactor when overridden)
+        // Rule 4: Upcoding & CMS Medicare Reference-Based Pricing Negotiation Target
         const downgrade =
           ref.downgradeByComplexity && ref.downgradeByComplexity[visitComplexity];
         if (downgrade) {
           const scaledCeiling = Number((downgrade.fairCommercialCeiling * cfScale).toFixed(2));
+          fairCommercialBenchmark = scaledCeiling;
           const ceilingCents = toCents(scaledCeiling);
           if (billedCents > ceilingCents) {
             fairCents = ceilingCents;
             violationType = "UPCODING_AND_OVERCHARGE";
-            reason = `Upcoded as ${code} despite '${visitComplexity}' complexity; downgraded to ${downgrade.targetCode} benchmark ($${scaledCeiling.toFixed(
+            reason = `Billed as high-severity ${code} despite '${visitComplexity}' visit complexity; downgraded to ${downgrade.targetCode} Reference-Based Pricing target of $${scaledCeiling.toFixed(
               2
-            )}).`;
+            )} (100% CMS Medicare facility baseline: $${(cmsMedicareRate ?? 0).toFixed(2)}). Request an Itemized Bill & Hospital Financial Assistance (IRS § 501(r)).`;
           }
         } else {
           const scaledCeiling = Number((ref.fairCommercialCeiling * cfScale).toFixed(2));
+          fairCommercialBenchmark = scaledCeiling;
           const ceilingCents = toCents(scaledCeiling);
           if (billedCents > ceilingCents) {
             fairCents = ceilingCents;
             violationType = "BENCHMARK_OVERCHARGE";
-            reason = `Billed amount exceeds CMS commercial benchmark ($${scaledCeiling.toFixed(
+            reason = `Billed amount exceeds the Fair Commercial Negotiation Target of $${scaledCeiling.toFixed(
               2
-            )}) by $${toDollars(billedCents - ceilingCents).toFixed(2)}.`;
+            )} (150%–200% of CMS Medicare; 100% CMS Medicare/CLFS baseline is $${(cmsMedicareRate ?? 0).toFixed(
+              2
+            )} [National $${ref.cmsNationalFacilityRate.toFixed(2)}]) by $${toDollars(
+              billedCents - ceilingCents
+            ).toFixed(2)}. Use as Reference-Based Pricing negotiation benchmark alongside Financial Assistance.`;
           }
         }
       }
@@ -418,21 +458,27 @@ export function auditHouseholdBill(input = {}) {
     totalFairCents += fairCents;
     totalSavingsCents += deltaCents;
 
+    const rowStatus =
+      violationType ||
+      (ref || hasLiveMedicalMatch ? "VERIFIED" : "BASE_RATE_UNAUDITED");
+
     const rowRecord = {
       id: `line-${i + 1}-${code}`,
       code,
       title: `${code} — ${
         raw.description ||
-        (ref ? ref.description : liveMeta ? liveMeta.officialDescription : "Service Charge")
+        (ref ? ref.description : hasLiveMedicalMatch ? liveMeta.officialDescription : "Service Charge")
       }`,
       subtitle: reason,
       billedAmount: toDollars(billedCents),
       fairAmount: toDollars(fairCents),
+      cmsMedicareBaseline: cmsMedicareRate,
+      fairCommercialTarget: fairCommercialBenchmark,
       savingsAmount: toDollars(deltaCents),
       originalLabel: `$${toDollars(billedCents).toFixed(2)}`,
       fairLabel: `$${toDollars(fairCents).toFixed(2)}`,
       deltaLabel: deltaCents > 0 ? `-$${toDollars(deltaCents).toFixed(2)}` : "OK",
-      status: violationType || "VERIFIED",
+      status: rowStatus,
       citation,
       actionTool: deltaCents > 0 ? "generate_official_dispute_or_claim" : null,
       actionLabel: deltaCents > 0 ? "Add to Dispute" : null,
@@ -506,14 +552,19 @@ export async function auditHouseholdBillLive(input = {}, options = {}) {
   for (let i = 0; i < items.length; i++) {
     const item = items[i];
     const ref = inferBenchmarkFromDescription(item.code, item.description);
-    if (!ref && (item.code || item.description)) {
-      const codeKey = String(item.code || `ITEM-${i + 1}`).toUpperCase();
+    const rawCodeStr = String(item.code || "").trim();
+    const isMedicalCodePattern =
+      /^[A-Z0-9]{5}$/i.test(rawCodeStr) || /^\d{4,5}-\d{3,4}/.test(rawCodeStr);
+    if (!ref && isMedicalCodePattern) {
+      const codeKey = rawCodeStr.toUpperCase();
       try {
         const liveMeta = await apiLookupMedicalCode(
-          { code: item.code || "", query: item.description || item.code },
+          { code: rawCodeStr, query: item.description || rawCodeStr },
           options
         );
-        liveCodeMetadataMap[codeKey] = liveMeta;
+        if (liveMeta && liveMeta.matched) {
+          liveCodeMetadataMap[codeKey] = liveMeta;
+        }
       } catch {
         // Ignore network errors and continue deterministic audit
       }
