@@ -251,7 +251,7 @@ export const CMS_CPT_BENCHMARKS = Object.freeze({
     cmsNationalFacilityRate: 0.0,
     fairCommercialCeiling: 0.0,
     junkFeeWhenCustomerOwned: true,
-    authority: "Television Viewer Protection Act (47 U.S.C. § 562) & FCC Broadband Equipment Billing Rules — Ban on charging for customer-owned equipment"
+    authority: "Contractual Non-Provision of Equipment (Customer-Owned Modem), FTC Act § 5 (15 U.S.C. § 45 Unfair Billing) & FCC Broadband Label Rule (47 C.F.R. § 8.1(a); supporting analogy 47 U.S.C. § 562)"
   },
   "ISP-SURCHARGE": {
     code: "ISP-SURCHARGE",
@@ -270,7 +270,7 @@ export const CMS_CPT_BENCHMARKS = Object.freeze({
     cmsNationalFacilityRate: 0.0,
     fairCommercialCeiling: 0.0,
     junkFeeAlways: true,
-    authority: "FCC Truth-in-Billing Rules (47 C.F.R. § 64.2401) & FCC Broadband Consumer Label Rules (47 C.F.R. § 8.1(a)) — Non-governmental carrier cost-recovery and unbundled broadcast surcharges"
+    authority: "Contractual Unsubscribed Service / Discretionary Cost-Recovery Surcharge Challenge (FTC Act § 5, 15 U.S.C. § 45 & FCC Broadband Consumer Label Rule, 47 C.F.R. § 8.1(a); supporting analogy 47 C.F.R. § 64.2401)"
   },
   "UTIL-ADMIN": {
     code: "UTIL-ADMIN",
@@ -413,12 +413,12 @@ export function auditHouseholdBill(input = {}) {
         // Rule 3: Customer-owned equipment fee
         fairCents = 0;
         violationType = "ILLEGAL_EQUIPMENT_FEE";
-        reason = "Customer owns router/modem; charging monthly rental fee for unleased equipment is prohibited (47 U.S.C. § 562 / FCC Equipment Rules). Provide modem MAC/serial to remove & refund.";
+        reason = "Billing Error for Unprovided Equipment: Customer owns router/modem; charging monthly rental for unleased equipment breaches service contract, FTC Act § 5 (15 U.S.C. § 45), and FCC Broadband Label Rules (47 C.F.R. § 8.1(a); analogous to 47 U.S.C. § 562). Provide modem MAC/serial for removal and retroactive refund.";
         citation = ref.authority;
       } else if (ref.junkFeeAlways) {
         fairCents = 0;
         violationType = "DISCRETIONARY_CARRIER_SURCHARGE";
-        reason = `${raw.description || ref.description} is a non-governmental carrier cost-recovery or unbundled broadcast surcharge (not a statutory tax) disputable under FCC Truth-in-Billing (47 C.F.R. § 64.2401).`;
+        reason = `${raw.description || ref.description} is an unsubscribed TV/broadcast tier fee or non-governmental carrier cost-recovery surcharge (not a statutory tax). Challenge primarily as an unsubscribed service / undisclosed fee under contract, FTC Act § 5, and FCC Broadband Label rules (47 C.F.R. § 8.1(a)).`;
         citation = ref.authority;
       } else {
         // Rule 4: Upcoding & CMS Medicare Reference-Based Pricing Negotiation Target
@@ -431,9 +431,9 @@ export function auditHouseholdBill(input = {}) {
           if (billedCents > ceilingCents) {
             fairCents = ceilingCents;
             violationType = "UPCODING_AND_OVERCHARGE";
-            reason = `Billed as high-severity ${code} despite '${visitComplexity}' visit complexity; downgraded to ${downgrade.targetCode} Reference-Based Pricing target of $${scaledCeiling.toFixed(
+            reason = `Billed as high-severity ${code} despite '${visitComplexity}' visit complexity; downgraded to ${downgrade.targetCode} Reference-Based Pricing negotiation target of $${scaledCeiling.toFixed(
               2
-            )} (100% CMS Medicare facility baseline: $${(cmsMedicareRate ?? 0).toFixed(2)}). Request an Itemized Bill & Hospital Financial Assistance (IRS § 501(r)).`;
+            )} (100% CMS Medicare Physician Fee Schedule baseline: $${(cmsMedicareRate ?? 0).toFixed(2)}; note that hospital OPPS facility fees are billed separately on UB-04). Request an Itemized Bill, check insurance EOB, and apply for Hospital Financial Assistance (IRS § 501(r)).`;
           }
         } else {
           const scaledCeiling = Number((ref.fairCommercialCeiling * cfScale).toFixed(2));
@@ -444,11 +444,11 @@ export function auditHouseholdBill(input = {}) {
             violationType = "BENCHMARK_OVERCHARGE";
             reason = `Billed amount exceeds the Fair Commercial Negotiation Target of $${scaledCeiling.toFixed(
               2
-            )} (150%–200% of CMS Medicare; 100% CMS Medicare/CLFS baseline is $${(cmsMedicareRate ?? 0).toFixed(
+            )} (150%–200% of CMS Medicare; 100% CMS Medicare PFS/CLFS baseline is $${(cmsMedicareRate ?? 0).toFixed(
               2
             )} [National $${ref.cmsNationalFacilityRate.toFixed(2)}]) by $${toDollars(
               billedCents - ceilingCents
-            ).toFixed(2)}. Use as Reference-Based Pricing negotiation benchmark alongside Financial Assistance.`;
+            ).toFixed(2)}. Note: CMS rates serve as a negotiation reference (not a mandatory hospital price cap) and reflect professional/lab schedules (facility OPPS fees may be separate); combine with Itemized Bill & IRS § 501(r) Financial Assistance.`;
           }
         }
       }
@@ -525,6 +525,8 @@ export function auditHouseholdBill(input = {}) {
     totalFair,
     totalSavings,
     violationCount: violations.length,
+    auditMethodologyNote:
+      "Medical CPT benchmarks reflect CMS Physician Fee Schedule (PFS) / CLFS rates and a 150%–200% Reference-Based Pricing negotiation target (not a mandatory hospital price cap, except NCCI unbundling edits and No Surprises Act out-of-network emergency protections). Hospital ED bills often separate Physician (CMS-1500) and Facility OPPS/APC (UB-04) charges; always request an itemized bill, verify insurance EOB processing, and apply for Hospital Financial Assistance (IRS § 501(r) / state charity care). For broadband/ISP bills, challenge unleased equipment and unsubscribed TV broadcast fees primarily as contractual billing errors and FTC Act § 5 / FCC Broadband Label violations.",
     violations,
     rows: auditedRows,
     voiceSummary
