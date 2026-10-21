@@ -12,7 +12,8 @@ import { apiQueryCpscRecalls } from "../tools/api-tools.mjs";
 
 export const VERIFIED_RECALL_LEDGER = Object.freeze([
   {
-    recallId: "CPSC-24-311",
+    recallId: "CPSC-25-063",
+    cpscQuery: "Switchback",
     agency: "CPSC",
     keywords: ["Stanley", "Switchback", "Trigger Action", "Travel Mug", "Thermos"],
     productName: "Stanley Switchback & Trigger Action Stainless Steel Travel Mugs",
@@ -20,11 +21,13 @@ export const VERIFIED_RECALL_LEDGER = Object.freeze([
     remedyType: "REPLACEMENT_OR_REFUND_VALUE",
     refundEstimateDollars: 35.0,
     requiresReceipt: false,
-    claimInstructions: "Submit model number on bottom of mug at Stanley1913.com recall portal for free replacement or $35 value credit.",
-    authority: "U.S. CPSC Recall #24-311 (16 C.F.R. Part 1115)"
+    claimInstructions: "Verify model number (20-01436, 20-01437, 20-02211) on bottom of mug at Stanley1913.com recall portal for free replacement lid/mug ($35 value).",
+    authority: "U.S. CPSC Recall #25-063 (16 C.F.R. Part 1115)",
+    officialUrl: "https://www.cpsc.gov/Recalls/2025/Stanley-Recalls-2-6-Million-Switchback-and-Trigger-Action-Travel-Mugs-Due-to-Burn-Hazard"
   },
   {
-    recallId: "CPSC-24-068",
+    recallId: "CPSC-23-130",
+    cpscQuery: "Cosori",
     agency: "CPSC",
     keywords: ["Cosori", "Air Fryer", "Smart Air Fryer", "CAF-P583"],
     productName: "Cosori 3.7-Quart and 5.8-Quart Air Fryers",
@@ -33,10 +36,12 @@ export const VERIFIED_RECALL_LEDGER = Object.freeze([
     refundEstimateDollars: 119.0,
     requiresReceipt: false,
     claimInstructions: "Submit batch code photo at recall.cosori.com (no store receipt required) for $119 replacement/refund claim.",
-    authority: "U.S. CPSC Recall #23-075 / #24-068"
+    authority: "U.S. CPSC Recall #23-130 (16 C.F.R. Part 1115)",
+    officialUrl: "https://www.cpsc.gov/Recalls/2023/Two-Million-COSORI-Air-Fryers-Recalled-by-Atekcity-Due-to-Fire-and-Burn-Hazards"
   },
   {
-    recallId: "CPSC-23-189",
+    recallId: "CPSC-23-140",
+    cpscQuery: "Rock 'n Play",
     agency: "CPSC",
     keywords: ["Fisher-Price", "Rock 'n Play", "Sleeper", "Bouncer"],
     productName: "Fisher-Price Rock 'n Play Infant Sleeper",
@@ -45,10 +50,12 @@ export const VERIFIED_RECALL_LEDGER = Object.freeze([
     refundEstimateDollars: 75.0,
     requiresReceipt: false,
     claimInstructions: "Return hub assembly in prepaid mailer to Mattel/Fisher-Price for up to $75 cash refund.",
-    authority: "U.S. CPSC Reannounced Recall #23-140 / #23-189"
+    authority: "U.S. CPSC Reannounced Recall #23-140",
+    officialUrl: "https://www.cpsc.gov/Recalls/2023/Fisher-Price-Reannounces-Recall-of-4-7-Million-Rock-n-Play-Sleepers-At-Least-Eight-Deaths-Occurred-After-Recall"
   },
   {
-    recallId: "CPSC-24-205",
+    recallId: "CPSC-24-309",
+    cpscQuery: "Steam Shot",
     agency: "CPSC",
     keywords: ["Bissell", "Steam Shot", "Handheld Steam Cleaner", "39N7"],
     productName: "Bissell Steam Shot Handheld Steam Cleaners (Series 39N7)",
@@ -56,23 +63,26 @@ export const VERIFIED_RECALL_LEDGER = Object.freeze([
     remedyType: "DIRECT_CASH_REFUND",
     refundEstimateDollars: 40.0,
     requiresReceipt: false,
-    claimInstructions: "Cut power cord and upload photo at Bissell.com/steamshotrecall for a $40 cash refund or $60 credit.",
-    authority: "U.S. CPSC Recall #24-316"
+    claimInstructions: "Cut power cord and upload photo at Bissell.com/steamshotrecall for a $40 cash refund or $60 digital credit.",
+    authority: "U.S. CPSC Recall #24-309 (16 C.F.R. Part 1115)",
+    officialUrl: "https://www.cpsc.gov/Recalls/2024/BISSELL-Recalls-More-Than-3-Million-Steam-Shot-Handheld-Steam-Cleaners-Due-to-Burn-Hazard"
   },
   {
-    recallId: "FDA-2025-CINN",
+    recallId: "FDA-2024-WANABANA",
     agency: "openFDA",
     keywords: ["Cinnamon", "Ground Cinnamon", "WanaBana", "Supreme Tradition", "Apple Cinnamon"],
-    productName: "Ground Cinnamon & Cinnamon Applesauce Pouches (Elevated Lead Alert)",
-    hazard: "FDA Class I / Public Health Alert: Elevated lead levels detected in specific ground cinnamon lots.",
+    productName: "WanaBana Apple Cinnamon Fruit Puree Pouches & Ground Cinnamon (Elevated Lead Alert)",
+    hazard: "FDA Class I Recall & Public Health Alert: Elevated lead and chromium levels detected in cinnamon raw material lots.",
     remedyType: "STORE_CASH_REFUND",
     refundEstimateDollars: 18.0,
     requiresReceipt: false,
-    claimInstructions: "Return affected lot to point of purchase for immediate full cash refund under FDA Class I recall protocol.",
-    authority: "FDA Enforcement Report / 21 U.S.C. § 350l"
+    claimInstructions: "Verify lot number on pouch/jar and return affected product to point of purchase (Dollar Tree / grocery retailer) for full store refund under FDA Class I recall protocol.",
+    authority: "FDA Class I Recall Event #93399 / 21 U.S.C. § 350l",
+    officialUrl: "https://www.fda.gov/food/outbreaks-foodborne-illness/investigation-elevated-lead-levels-cinnamon-applesauce-pouches-november-2023"
   },
   {
-    recallId: "CPSC-24-226",
+    recallId: "CPSC-24-069",
+    cpscQuery: "BlendJet",
     agency: "CPSC",
     keywords: ["BlendJet", "BlendJet 2", "Portable Blender"],
     productName: "BlendJet 2 Portable Blenders",
@@ -81,10 +91,12 @@ export const VERIFIED_RECALL_LEDGER = Object.freeze([
     refundEstimateDollars: 50.0,
     requiresReceipt: false,
     claimInstructions: "Submit serial number and cut base gasket photo at blendjet.com/safetyandrecall for free replacement base ($50 value).",
-    authority: "U.S. CPSC Recall #24-067"
+    authority: "U.S. CPSC Recall #24-069 (16 C.F.R. Part 1115)",
+    officialUrl: "https://www.cpsc.gov/Recalls/2024/BlendJet-Recalls-4-8-Million-BlendJet-2-Portable-Blenders-Due-to-Fire-and-Laceration-Hazards"
   },
   {
-    recallId: "CPSC-24-350",
+    recallId: "CPSC-24-328",
+    cpscQuery: "Samsung",
     agency: "CPSC",
     keywords: ["Samsung", "Slide-In Electric Range", "Stove Knobs"],
     productName: "Samsung Slide-In Electric Ranges with Front-Mounted Knobs",
@@ -93,10 +105,11 @@ export const VERIFIED_RECALL_LEDGER = Object.freeze([
     refundEstimateDollars: 45.0,
     requiresReceipt: false,
     claimInstructions: "Request free knob lock/cover kit from Samsung recall portal without purchase receipt.",
-    authority: "U.S. CPSC Recall #24-328"
+    authority: "U.S. CPSC Recall #24-328 (16 C.F.R. Part 1115)",
+    officialUrl: "https://www.cpsc.gov/Recalls/2024/Samsung-Recalls-Slide-In-Electric-Ranges-Due-to-Fire-Hazard"
   },
   {
-    recallId: "FDA-2024-BOARS",
+    recallId: "USDA-FSIS-023-2024",
     agency: "openFDA / USDA",
     keywords: ["Boar's Head", "Deli Meat", "Liverwurst", "Ham", "Bologna"],
     productName: "Boar's Head Provisions Ready-to-Eat Deli Meat Products",
@@ -105,7 +118,8 @@ export const VERIFIED_RECALL_LEDGER = Object.freeze([
     refundEstimateDollars: 24.0,
     requiresReceipt: false,
     claimInstructions: "Return package or label to grocer customer service desk for immediate full cash refund.",
-    authority: "USDA FSIS / FDA Class I Recall #023-2024"
+    authority: "USDA FSIS Class I Recall #023-2024",
+    officialUrl: "https://www.fsis.usda.gov/recalls-alerts/boars-head-provisions-co--recalls-ready-eat-liverwurst-and-other-deli-meat-products"
   }
 ]);
 
@@ -188,16 +202,20 @@ export async function scanHouseholdRecalls(input = {}, options = {}) {
 
     if (matched) {
       let liveCpscVerified = false;
-      let liveCpscUrl = null;
-      if (enableLivePing && matched.agency === "CPSC" && matched.keywords[0]) {
+      let liveCpscUrl = matched.officialUrl || null;
+      if (enableLivePing && matched.agency === "CPSC") {
         try {
           const cpscCheck = await apiQueryCpscRecalls(
-            { query: matched.keywords[0], limit: 1 },
+            { query: matched.cpscQuery || matched.keywords[0], limit: 3 },
             { timeoutMs: 1800 }
           );
           if (cpscCheck.sourceMetadata?.liveApiCalled && cpscCheck.records?.length > 0) {
             liveCpscVerified = true;
-            liveCpscUrl = cpscCheck.records[0].url || null;
+            const exactRec =
+              cpscCheck.records.find((r) =>
+                matched.keywords.some((kw) => String(r.title || "").toLowerCase().includes(kw.toLowerCase()))
+              ) || cpscCheck.records[0];
+            liveCpscUrl = matched.officialUrl || exactRec.url || null;
           }
         } catch {
           liveCpscVerified = false;
