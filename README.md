@@ -3,7 +3,14 @@
 [![Alexa+ MCP Protocol](https://img.shields.io/badge/Alexa%2B_MCP-2026--07--28_%7C_2025--11--25-00CAFF?style=flat-square)](#)
 [![Pre-Flight Linter](https://img.shields.io/badge/Pre--Flight_Readiness-7%2F7_Checks_Pass-15803D?style=flat-square)](./certification-verdict.json)
 [![Hybrid 19-Tool Architecture](https://img.shields.io/badge/Architecture-19_Tools_(API_%2B_Math_%2B_Code_Mode)-38BDF8?style=flat-square)](#)
+[![Live Echo Show Sandbox](https://img.shields.io/badge/Live_Demo-Echo_Show_Sandbox-0284C7?style=flat-square)](https://billshield-mcp.duckdns.org/simulator)
 [![License: MIT](https://img.shields.io/badge/License-MIT-F8FAFC?style=flat-square)](./LICENSE)
+
+> **Live Hosted Endpoints (Zero Setup Required):**
+> - **Interactive Echo Show 3-Mode Device Sandbox:** [`https://billshield-mcp.duckdns.org/simulator`](https://billshield-mcp.duckdns.org/simulator)
+> - **Live Streamable HTTP MCP Endpoint (`2026-07-28` / `2025-11-25` / `2025-06-18`):** `https://billshield-mcp.duckdns.org/mcp`
+> - **Inspect Live Server with Official Amazon CLI:** `npx @alexa-ai/addon-local-inspector --url https://billshield-mcp.duckdns.org/mcp --output-dir ./inspect-out`
+> - **Live Health Check:** [`https://billshield-mcp.duckdns.org/health`](https://billshield-mcp.duckdns.org/health)
 
 **BillShield MCP** is a multi-modal **Alexa+ Model Context Protocol (MCP) Add-on** (`Inline`, `Fullscreen`, and `Voice-only`) that acts as an autonomous household financial auditor for both **renters** and **homeowners**. Built on a **19-tool hybrid agentic architecture** (Atomic Live Public APIs + Pure Parameterized Math Calculators with zero hardcoded constants + V8 Code Mode Sandbox + One-Shot Workflows), families can ask Alexa+ by voice or web chat to audit inflated medical/ISP bills, optimize electric peak/off-peak utility tariffs, unlock renter-safe cash rebates, scan kitchen/nursery items for CPSC & openFDA cash recall refunds, and generate statute-cited dispute packets ready to sign and send.
 

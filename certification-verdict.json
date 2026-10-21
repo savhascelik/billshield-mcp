@@ -1,8 +1,8 @@
 {
   "schemaVersion": "1.0.0",
   "inspector": "alexa-mcp-kit Pre-Flight Readiness Linter (compatible with @alexa-ai/addon-local-inspector)",
-  "evaluatedAt": "2026-10-20T22:49:39.951Z",
-  "endpointUrl": "http://127.0.0.1:61677/mcp",
+  "evaluatedAt": "2026-10-21T08:47:00.539Z",
+  "endpointUrl": "http://127.0.0.1:64864/mcp",
   "protocolVersion": "2026-07-28",
   "verdict": "CERTIFIED",
   "readinessStatus": "PREFLIGHT_READY",
@@ -22,7 +22,7 @@
       "category": "Protocol & Schema",
       "title": "Streamable HTTP (2026-07-28 / 2025-11-25 / 2025-06-18) Handshake & JSON Schema Integrity",
       "status": "PASS",
-      "details": "Verified protocolVersion=2026-07-28, Mcp-Session-Id=e16285d7..., 19 tool schemas valid."
+      "details": "Verified protocolVersion=2026-07-28, Mcp-Session-Id=dcff4f59..., 19 tool schemas valid."
     },
     {
       "id": "VR-01",
