@@ -7,9 +7,9 @@
   "main": "./src/server.mjs",
   "repository": {
     "type": "git",
-    "url": "https://github.com/savhascelik/billshield-mcp-.git"
+    "url": "https://github.com/savhascelik/billshield-mcp.git"
   },
-  "homepage": "https://github.com/savhascelik/billshield-mcp-#readme",
+  "homepage": "https://github.com/savhascelik/billshield-mcp#readme",
   "scripts": {
     "start": "node src/server.mjs",
     "cert": "node src/run-cert.mjs",
